@@ -2,20 +2,11 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
-from recipes.models import (
-    FavoriteRecipes,
-    Ingredient,
-    Recipe,
-    ShoppingCart,
-    Tag,
-)
+from recipes.models import FavoriteRecipes, Ingredient, Recipe, ShoppingCart, Tag
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from users.models import Follow
@@ -69,10 +60,14 @@ class UserViewSet(DjoserUserViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def subscriptions(self, request):
-        user: User = request.user
+        user = request.user
         follows = User.objects.filter(following__user=user)
         page = self.paginate_queryset(follows)
-        serializer = FollowSerializer(page, many=True, context={"request": request})
+        serializer = FollowSerializer(
+            page,
+            many=True,
+            context={"request": request},
+        )
         return self.get_paginated_response(serializer.data)
 
     @action(
@@ -140,7 +135,8 @@ class RecipeViewSet(ModelViewSet):
     def __add(self, model, user, recipe_id):
         if model.objects.filter(user=user, recipe__id=recipe_id).exists():
             return Response(
-                {"errors": "Рецепт уже добавлен!"}, status=status.HTTP_400_BAD_REQUEST
+                {"errors": ""},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         recipe = get_object_or_404(Recipe, id=recipe_id)
         model.objects.create(user=user, recipe=recipe)
@@ -153,5 +149,6 @@ class RecipeViewSet(ModelViewSet):
             obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
-            {"errors": "Рецепт уже удален!"}, status=status.HTTP_400_BAD_REQUEST
+            {"errors": ""},
+            status=status.HTTP_400_BAD_REQUEST,
         )

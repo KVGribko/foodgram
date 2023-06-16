@@ -1,12 +1,12 @@
 from django.contrib import admin
 
 from .models import (
+    FavoriteRecipes,
     Ingredient,
     Recipe,
     RecipeIngredient,
     ShoppingCart,
     Tag,
-    FavoriteRecipes,
 )
 
 
@@ -28,7 +28,13 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ["name", "author", "tags"]
     search_fields = ["name"]
     readonly_fields = ["favorite"]
-    fields = ["image", ("name", "author"), "text", ("tags", "cooking_time"), "favorite"]
+    fields = [
+        "image",
+        ("name", "author"),
+        "text",
+        ("tags", "cooking_time"),
+        "favorite",
+    ]
 
     def display_tags(self, obj):
         return ", ".join([tag.name for tag in obj.tags.all()])
