@@ -88,8 +88,8 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:latest
             sudo docker compose stop
-            sudo docker compose rm -f foodgram-frontend
-            sudo docker compose rm -f foodgram-backend
+            sudo docker compose rm foodgram-frontend
+            sudo docker compose rm foodgram-backend
             sudo docker system prune
             sudo docker volume prune
 
