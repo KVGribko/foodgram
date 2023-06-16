@@ -16,7 +16,7 @@ services:
 
   frontend:
     container_name: foodgram-frontend
-    build: mrvilbi//foodgram-frontend:latest
+    build: mrvilbi/foodgram-frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
