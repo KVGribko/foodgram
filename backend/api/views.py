@@ -89,7 +89,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = ("^name", "name")
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = None
 
 
 class RecipeViewSet(ModelViewSet):
