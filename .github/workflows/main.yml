@@ -85,13 +85,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:latest
-            sudo docker stop $(sudo docker ps -a -q)
-            sudo docker compose rm -f foodgram-frontend
-            sudo docker compose rm -f foodgram-backend
-            sudo docker system prune
-            sudo docker volume prune
+
 
             touch .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
@@ -102,6 +96,5 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
 
-            sudo docker compose up -d --build
 
 
