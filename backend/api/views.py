@@ -94,7 +94,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = PageLimitPagination
-    http_method_names = ["get", "post", "patch", "delete"]
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -130,7 +129,7 @@ class RecipeViewSet(ModelViewSet):
     def __add(self, model, user, recipe_id):
         if model.objects.filter(user=user, recipe__id=recipe_id).exists():
             return Response(
-                {"errors": ""},
+                {"errors": "asdf"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         recipe = get_object_or_404(Recipe, id=recipe_id)
@@ -144,6 +143,6 @@ class RecipeViewSet(ModelViewSet):
             obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
-            {"errors": ""},
+            {"errors": "asfsd"},
             status=status.HTTP_400_BAD_REQUEST,
         )
