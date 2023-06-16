@@ -124,7 +124,7 @@ class RecipeViewSet(ModelViewSet):
     def shopping_cart(self, request, pk):
         if request.method == "POST":
             return self.__add(ShoppingCart, request.user, pk)
-        return self.delete_from(ShoppingCart, request.user, pk)
+        return self.__delete(ShoppingCart, request.user, pk)
 
     def __add(self, model, user, recipe_id):
         if model.objects.filter(user=user, recipe__id=recipe_id).exists():
