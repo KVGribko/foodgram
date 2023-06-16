@@ -147,7 +147,7 @@ class GetRecipeSerializer(ModelSerializer):
         user = self.context.get("request").user
         if user.is_anonymous:
             return False
-        return user.carts.filter(recipe=recipe).exists()
+        return user.shopping_cart.filter(recipe=recipe).exists()
 
 
 class RecipeShortSerializer(ModelSerializer):
