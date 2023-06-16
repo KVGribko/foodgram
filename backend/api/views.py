@@ -2,11 +2,13 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
-from recipes.models import FavoriteRecipes, Ingredient, Recipe, ShoppingCart, Tag
+from recipes.models import (FavoriteRecipes, Ingredient, Recipe, ShoppingCart,
+                            Tag)
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from users.models import Follow
@@ -14,15 +16,9 @@ from users.models import Follow
 from .filters import RecipeFilter
 from .pagination import PageLimitPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from .serializers import (
-    FollowSerializer,
-    GetRecipeSerializer,
-    IngredientSerializer,
-    PostRecipeSerializer,
-    RecipeShortSerializer,
-    TagSerializer,
-    UserSerializer,
-)
+from .serializers import (FollowSerializer, GetRecipeSerializer,
+                          IngredientSerializer, PostRecipeSerializer,
+                          RecipeShortSerializer, TagSerializer, UserSerializer)
 
 User = get_user_model()
 
