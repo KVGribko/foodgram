@@ -42,8 +42,8 @@ class UserViewSet(DjoserUserViewSet):
         if request.method == "DELETE":
             if sub.exists():
                 sub.delete()
-                return Response(status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         if request.method == "POST":
             if sub.exists():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
