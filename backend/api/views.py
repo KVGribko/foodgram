@@ -123,7 +123,7 @@ class RecipeViewSet(ModelViewSet):
     )
     def shopping_cart(self, request, pk):
         if request.method == "POST":
-            return self.add_to(ShoppingCart, request.user, pk)
+            return self.__add(ShoppingCart, request.user, pk)
         return self.delete_from(ShoppingCart, request.user, pk)
 
     def __add(self, model, user, recipe_id):
