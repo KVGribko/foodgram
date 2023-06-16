@@ -62,9 +62,7 @@ class SubscribeSerializer(UserSerializer):
     recipes = SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + (
-            'recipes_count', 'recipes'
-        )
+        fields = UserSerializer.Meta.fields + ['recipes_count', 'recipes']
         read_only_fields = ('email', 'username')
 
     def get_recipes_count(self, obj):
