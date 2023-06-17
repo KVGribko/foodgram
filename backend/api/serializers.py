@@ -62,19 +62,19 @@ class SubscribeSerializer(UserSerializer):
     recipes = SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['recipes_count', 'recipes']
-        read_only_fields = ('email', 'username')
+        fields = UserSerializer.Meta.fields + ["recipes_count", "recipes"]
+        read_only_fields = ["email", "username"]
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
     def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
+        request = self.context.get("request")
+        limit = request.GET.get("recipes_limit")
         recipes = obj.recipes.all()
         if limit:
             recipes = recipes[:int(limit)]
-        serializer = RecipeShortSerializer(recipes, many=True, read_only=True)
+        serializer = RecipeShortSerializer(recipes, many=True)
         return serializer.data
 
 
@@ -113,11 +113,7 @@ class TagSerializer(ModelSerializer):
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = [
-            "id",
-            "name",
-            "measurement_unit",
-        ]
+        fields = "__all__"
 
 
 class Base64ImageField(ImageField):
