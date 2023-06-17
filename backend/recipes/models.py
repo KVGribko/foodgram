@@ -9,10 +9,16 @@ class Tag(models.Model):
     color = models.CharField(max_length=7, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
 
+    class Meta:
+        ordering = ["name"]
+
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=200, unique=True)
     measurement_unit = models.CharField(max_length=200)
+
+    class Meta:
+        ordering = ["name"]
 
 
 class Recipe(models.Model):
@@ -34,6 +40,13 @@ class Recipe(models.Model):
         related_name="recipes",
     )
     cooking_time = models.PositiveIntegerField(default=0)
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+    )
+
+    class Meta:
+        ordering = ['-pub_date']
 
 
 class RecipeIngredient(models.Model):
