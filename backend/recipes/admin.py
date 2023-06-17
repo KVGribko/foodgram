@@ -15,7 +15,7 @@ class IngredientResource(resources.ModelResource):
 
 @admin.register(Ingredient)
 class ImportIngredientsAdmin(ImportExportModelAdmin):
-    resource_classe = IngredientResource
+    resource_class = IngredientResource
     list_display = ["name", "measurement_unit"]
     search_fields = ["name"]
     list_filter = ["name"]
