@@ -44,12 +44,22 @@ class UserViewSet(DjoserUserViewSet):
             if sub.exists():
                 sub.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'errors': "You are not subscribed to this author"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if request.method == "POST":
             if sub.exists():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            Follow.objects.create(user=user, author=author)
-            return Response(status=status.HTTP_201_CREATED)
+                return Response(
+                    {'errors': "You are already subscribed to this author"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            follow = Follow.objects.create(user=user, author=author)
+            serializer = FollowSerializer(
+                follow.author,
+                context={'request': request},
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         detail=False,
