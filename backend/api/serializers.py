@@ -203,6 +203,7 @@ class PostRecipeSerializer(ModelSerializer):
         user = self.context.get("request").user
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
+        print(ingredients)
         recipe = Recipe.objects.create(author=user, **validated_data)
         recipe.tags.set(tags)
         self.set_ingredients(recipe, ingredients)
@@ -212,6 +213,7 @@ class PostRecipeSerializer(ModelSerializer):
     def update(self, recipe, validated_data):
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
+        print(ingredients)
         RecipeIngredient.objects.filter(recipe=recipe).delete()
         recipe.tags.set(tags)
         self.set_ingredients(recipe, ingredients)
@@ -222,10 +224,10 @@ class PostRecipeSerializer(ModelSerializer):
         RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
                 recipe=recipe,
-                ingredients=ingredient,
-                amount=amount,
+                ingredient=Ingredient.objects.get(id=ingredient["id"]),
+                amount=ingredient["amount"],
             )
-            for ingredient, amount in ingredients.values()
+            for ingredient in ingredients
         )
 
     def to_representation(self, instance):
