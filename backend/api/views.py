@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
@@ -157,3 +158,39 @@ class RecipeViewSet(ModelViewSet):
             {"errors": "asfsd"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+    )
+    def download_shopping_cart(self, request):
+        user = request.user
+        ingredients = Ingredient.objects.raw(
+            f"""
+            SELECT
+                --*
+                i.id,
+                i.name,
+                SUM(ri.amount) AS amount,
+                i.measurement_unit AS unit
+            FROM
+                recipes_ingredient AS i
+                INNER JOIN recipes_shoppingcart AS sc ON sc.user_id = {user.id}
+                INNER JOIN recipes_recipeingredient AS ri
+                ON
+                    sc.recipe_id = ri.recipe_id AND i.id = ri.ingredient_id
+            GROUP BY i.id;
+            """
+        )
+        shopping_list = [
+            f"{ingredient.name}: {ingredient.amount} {ingredient.unit}"
+            for ingredient in ingredients
+        ]
+        shopping_list = "\n".join(shopping_list)
+        response = HttpResponse(
+            shopping_list, content_type="text.txt; charset=utf-8"
+        )
+        file_name = f'{user.username}_shopping_list.txt'
+        response['Content-Disposition'] = f'attachment; filename={file_name}'
+        return response
