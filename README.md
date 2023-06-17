@@ -20,15 +20,8 @@ admin password: ad
 Запуск проекта в Docker
 ----------
 
-1. Клонировать репозиторий и перейти в него в командной строке:
+1. Подготовить удаленный сервер выполнив следующие команды:
 ```bash
-git clone https://github.com/KVGribko/foodgram-project-react.git
-
-cd foodgram-project-react
-```
-2. Подготовить удаленный сервер выполнив следующие команды:
-```bash
-
 sudo apt update
 sudo apt upgrade -y
 sudo apt install python3-pip python3-venv git -y
@@ -58,6 +51,12 @@ sudo systemctl start nginx
 sudo systemctl stop nginx
 
 sudo docker image prune -a
+```
+2. Клонировать репозиторий и перейти в него в командной строке:
+```bash
+git clone https://github.com/KVGribko/foodgram-project-react.git
+
+cd foodgram-project-react
 ```
 3. Скопировать на сервер файлы docker-compose.yml, nginx.conf
 ```bash
