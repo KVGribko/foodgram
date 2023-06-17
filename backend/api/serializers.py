@@ -200,11 +200,9 @@ class PostRecipeSerializer(ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        user = self.context.get("request").user
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
-        print(ingredients)
-        recipe = Recipe.objects.create(author=user, **validated_data)
+        recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
         self.set_ingredients(recipe, ingredients)
         return recipe
@@ -213,7 +211,6 @@ class PostRecipeSerializer(ModelSerializer):
     def update(self, recipe, validated_data):
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
-        print(ingredients)
         RecipeIngredient.objects.filter(recipe=recipe).delete()
         recipe.tags.set(tags)
         self.set_ingredients(recipe, ingredients)
