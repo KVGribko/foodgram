@@ -16,7 +16,7 @@ from users.models import Follow
 User = get_user_model()
 
 
-class UsersCreateSerializer(UserCreateSerializer):
+class UsersCreateSerializerForDjoser(UserCreateSerializer):
     class Meta:
         model = User
         fields = [
@@ -35,7 +35,7 @@ class UsersCreateSerializer(UserCreateSerializer):
         return username
 
 
-class UserSerializer(UserSerializer):
+class FoodgramUserSerializer(UserSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
 
     class Meta:
@@ -58,44 +58,29 @@ class UserSerializer(UserSerializer):
         return Follow.objects.filter(user=user, author=object.id).exists()
 
 
-class SubscribeSerializer(UserSerializer):
-    recipes_count = SerializerMethodField()
-    recipes = SerializerMethodField()
-
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ["recipes_count", "recipes"]
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
-
-    def get_recipes(self, obj):
-        request = self.context.get("request")
-        limit = request.GET.get("recipes_limit")
-        recipes = obj.recipes.all()
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = RecipeShortSerializer(recipes, many=True)
-        return serializer.data
+class Base64ImageField(ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith("data:image"):
+            format, imgstr = data.split(";base64,")
+            ext = format.split("/")[-1]
+            data = ContentFile(b64decode(imgstr), name="photo." + ext)
+        return super().to_internal_value(data)
 
 
-class RecipeFollowSerializer(ModelSerializer):
+class PreviewRecipeSerializer(ModelSerializer):
+    image = Base64ImageField()
+
     class Meta:
         model = Recipe
-        fields = [
-            "id",
-            "name",
-            "image",
-            "cooking_time",
-        ]
-        read_only_fields = "__all__"
+        fields = ["id", "name", "image", "cooking_time"]
 
 
-class FollowSerializer(UserSerializer):
-    recipes = RecipeFollowSerializer(many=True, read_only=True)
+class FollowSerializer(FoodgramUserSerializer):
+    recipes = PreviewRecipeSerializer(many=True, read_only=True)
     recipes_count = SerializerMethodField()
 
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + [
+    class Meta(FoodgramUserSerializer.Meta):
+        fields = FoodgramUserSerializer.Meta.fields + [
             "recipes",
             "recipes_count",
         ]
@@ -116,18 +101,9 @@ class IngredientSerializer(ModelSerializer):
         fields = "__all__"
 
 
-class Base64ImageField(ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith("data:image"):
-            format, imgstr = data.split(";base64,")
-            ext = format.split("/")[-1]
-            data = ContentFile(b64decode(imgstr), name="photo." + ext)
-        return super().to_internal_value(data)
-
-
 class GetRecipeSerializer(ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
-    author = UserSerializer(read_only=True)
+    author = FoodgramUserSerializer(read_only=True)
     ingredients = SerializerMethodField()
     is_favorited = SerializerMethodField(read_only=True)
     is_in_shopping_cart = SerializerMethodField(read_only=True)
@@ -166,14 +142,6 @@ class GetRecipeSerializer(ModelSerializer):
         return user.shopping_cart.filter(recipe=recipe).exists()
 
 
-class RecipeShortSerializer(ModelSerializer):
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
-
-
 class AddIngredientSerializer(Serializer):
     id = IntegerField()
     amount = IntegerField(min_value=1)
@@ -181,13 +149,13 @@ class AddIngredientSerializer(Serializer):
 
 class PostRecipeSerializer(ModelSerializer):
     tags = PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
-    author = UserSerializer(read_only=True)
+    author = FoodgramUserSerializer(read_only=True)
     ingredients = AddIngredientSerializer(many=True)
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
-        fields = (
+        fields = [
             "id",
             "tags",
             "author",
@@ -196,7 +164,7 @@ class PostRecipeSerializer(ModelSerializer):
             "image",
             "text",
             "cooking_time",
-        )
+        ]
 
     @transaction.atomic
     def create(self, validated_data):

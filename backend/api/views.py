@@ -16,16 +16,17 @@ from users.models import Follow
 from .filters import RecipeFilter
 from .pagination import PageLimitPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from .serializers import (FollowSerializer, GetRecipeSerializer,
-                          IngredientSerializer, PostRecipeSerializer,
-                          RecipeShortSerializer, TagSerializer, UserSerializer)
+from .serializers import (FollowSerializer, FoodgramUserSerializer,
+                          GetRecipeSerializer, IngredientSerializer,
+                          PostRecipeSerializer, PreviewRecipeSerializer,
+                          TagSerializer)
 
 User = get_user_model()
 
 
 class UserViewSet(DjoserUserViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = FoodgramUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PageLimitPagination
 
@@ -57,12 +58,12 @@ class UserViewSet(DjoserUserViewSet):
     )
     def subscriptions(self, request):
         user = request.user
-        follows = User.objects.filter(following__user=user)
-        page = self.paginate_queryset(follows)
         serializer = FollowSerializer(
-            page,
+            self.paginate_queryset(
+                User.objects.filter(following__user=user)
+            ),
             many=True,
-            context={"request": request},
+            context={'request': request},
         )
         return self.get_paginated_response(serializer.data)
 
@@ -70,7 +71,7 @@ class UserViewSet(DjoserUserViewSet):
         detail=False,
         methods=["get"],
         permission_classes=(IsAuthenticated,),
-        serializer_class=UserSerializer,
+        serializer_class=FoodgramUserSerializer,
     )
     def me(self, request):
         serializer = self.get_serializer(request.user)
@@ -134,7 +135,7 @@ class RecipeViewSet(ModelViewSet):
             )
         recipe = get_object_or_404(Recipe, id=recipe_id)
         model.objects.create(user=user, recipe=recipe)
-        serializer = RecipeShortSerializer(recipe)
+        serializer = PreviewRecipeSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def __delete(self, model, user, recipe_id):
