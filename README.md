@@ -2,6 +2,14 @@ Foodgram
 =====
 ![Foodgram](https://github.com/KVGribko/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
+for review
+----
+host: http://51.250.103.223/
+```
+admin email: ad@ad.ru
+admin username: ad
+admin password: ad
+```
 Описание проекта
 ----------
 Командный проект создан в рамках учебного курса Яндекс.Практикум.
