@@ -10,7 +10,7 @@ from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import (ImageField, IntegerField,
                                         ModelSerializer,
-                                        PrimaryKeyRelatedField)
+                                        PrimaryKeyRelatedField, Serializer)
 from users.models import Follow
 
 User = get_user_model()
@@ -174,7 +174,7 @@ class RecipeShortSerializer(ModelSerializer):
         fields = ("id", "name", "image", "cooking_time")
 
 
-class AddIngredientSerializer(ModelSerializer):
+class AddIngredientSerializer(Serializer):
     id = IntegerField()
     amount = IntegerField(min_value=1)
 
