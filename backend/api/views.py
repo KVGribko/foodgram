@@ -16,7 +16,7 @@ from users.models import Follow
 
 from .filters import RecipeFilter
 from .pagination import PageLimitPagination
-from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (FollowSerializer, FoodgramUserSerializer,
                           GetRecipeSerializer, IngredientSerializer,
                           PostRecipeSerializer, PreviewRecipeSerializer,
@@ -106,7 +106,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = PageLimitPagination
-    permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly | IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -141,7 +141,7 @@ class RecipeViewSet(ModelViewSet):
     def __add(self, model, user, recipe_id):
         if model.objects.filter(user=user, recipe__id=recipe_id).exists():
             return Response(
-                {"errors": "asdf"},
+                {"errors": "already exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         recipe = get_object_or_404(Recipe, id=recipe_id)
@@ -155,7 +155,7 @@ class RecipeViewSet(ModelViewSet):
             obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
-            {"errors": "asfsd"},
+            {"errors": "does not exist"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

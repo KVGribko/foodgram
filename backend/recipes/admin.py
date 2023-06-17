@@ -28,27 +28,21 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ["name", "author", "display_tags", "favorite"]
+    list_display = ["name", "author", "count_in_favorites"]
     list_filter = ["name", "author", "tags"]
     search_fields = ["name"]
-    readonly_fields = ["favorite"]
+    readonly_fields = ["count_in_favorites"]
     fields = [
         "image",
         ("name", "author"),
         "text",
-        ("tags", "cooking_time"),
-        "favorite",
+        "tags",
+        "cooking_time",
+        "count_in_favorites",
     ]
 
-    def display_tags(self, obj):
-        return ", ".join([tag.name for tag in obj.tags.all()])
-
-    display_tags.short_description = "Теги"
-
-    def favorite(self, obj):
+    def count_in_favorites(self, obj):
         return obj.in_favorite.count()
-
-    favorite.short_description = "Раз в избранном"
 
 
 @admin.register(RecipeIngredient)
