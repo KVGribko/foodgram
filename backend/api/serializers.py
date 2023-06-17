@@ -8,7 +8,8 @@ from djoser.serializers import (UserCreateSerializer, UserSerializer,
                                 ValidationError)
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import (ImageField, ModelSerializer,
+from rest_framework.serializers import (ImageField, IntegerField,
+                                        ModelSerializer,
                                         PrimaryKeyRelatedField)
 from users.models import Follow
 
@@ -174,17 +175,8 @@ class RecipeShortSerializer(ModelSerializer):
 
 
 class AddIngredientSerializer(ModelSerializer):
-    id = PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(),
-        source=Ingredient,
-    )
-
-    class Meta:
-        model = RecipeIngredient
-        fields = [
-            "id",
-            "amount",
-        ]
+    id = IntegerField()
+    amount = IntegerField(min_value=1)
 
 
 class PostRecipeSerializer(ModelSerializer):
