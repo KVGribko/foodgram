@@ -174,22 +174,21 @@ class PostRecipeSerializer(ModelSerializer):
             "cooking_time",
         ]
 
-    def validate(self, attrs):
-        tags = self.initial_data.get("tags")
-        ingredients = self.initial_data.get("ingredients")
-        self.v_tags(tags)
-        self.v_ingredients(ingredients)
-        return attrs
+    # def validate(self, attrs):
+    #     tags = self.initial_data.get("tags")
+    #     ingredients = self.initial_data.get("ingredients")
+    #     self.v_tags(tags)
+    #     self.v_ingredients(ingredients)
+    #     return attrs
 
-    def v_ingredients(self, ingredients):
+    def validate_ingredients(self, ingredients):
         if len(ingredients) == 0:
             raise ValidationError("Ingredients cannot be empty")
 
-        # for i, ingredient in enumerate(ingredients):
-        #     for j in range(i + 1, len(ingredients)):
-        #         if ingredient["id"] == ingredients[j]["id"]:
-        #             s = f"Ingredients cannot be repeated. {ingredient['id']} vs {ingredients[j]['id']}!"
-        #             raise ValidationError(s)
+        for i, ingredient in enumerate(ingredients):
+            for j in range(i + 1, len(ingredients)):
+                if ingredient["id"] == ingredients[j]["id"]:
+                    raise ValidationError("Ingredients cannot be repeated.")
 
         for ingredient in ingredients:
             if ingredient["amount"] <= 0:
@@ -198,7 +197,7 @@ class PostRecipeSerializer(ModelSerializer):
                 )
         return ingredients
 
-    def v_tags(self, tags):
+    def validate_tags(self, tags):
         if len(tags) == 0:
             raise ValidationError("Tags cannot be empty")
 
