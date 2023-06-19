@@ -180,7 +180,7 @@ class PostRecipeSerializer(ModelSerializer):
 
         for i, ingredient in enumerate(ingredients):
             for j in range(i + 1, len(ingredients)):
-                if ingredient == ingredients[j]:
+                if ingredient["name"] == ingredients[j]["name"]:
                     raise ValidationError("Ingredients cannot be repeated")
 
         for ingredient in ingredients:
@@ -196,7 +196,7 @@ class PostRecipeSerializer(ModelSerializer):
 
         for i, tag in enumerate(tags):
             for j in range(i + 1, len(tags)):
-                if tag == tags[j]:
+                if tag["name"] == tags[j]["name"]:
                     raise ValidationError("Tags cannot be repeated")
         return tags
 
