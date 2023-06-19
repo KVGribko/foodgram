@@ -174,7 +174,14 @@ class PostRecipeSerializer(ModelSerializer):
             "cooking_time",
         ]
 
-    def validate_ingredients(self, ingredients):
+    def validate(self, attrs):
+        tags = self.initial_data.get("tags")
+        ingredients = self.initial_data.get("ingredients")
+        self.v_tags(tags)
+        self.v_ingredients(ingredients)
+        return attrs
+
+    def v_ingredients(self, ingredients):
         if len(ingredients) == 0:
             raise ValidationError("Ingredients cannot be empty")
 
@@ -191,7 +198,7 @@ class PostRecipeSerializer(ModelSerializer):
                 )
         return ingredients
 
-    def validate_tags(self, tags):
+    def v_tags(self, tags):
         if len(tags) == 0:
             raise ValidationError("Tags cannot be empty")
 
