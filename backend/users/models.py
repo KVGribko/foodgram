@@ -13,13 +13,17 @@ class User(AbstractUser):
             "unique": "A user with the same name already exists",
         },
     )
-    first_name = models.CharField("First name", max_length=150, blank=True)
-    last_name = models.CharField("Last name", max_length=150, blank=True)
+    first_name = models.CharField("Имя", max_length=150, blank=True)
+    last_name = models.CharField("Фамилия", max_length=150, blank=True)
     email = models.EmailField(
         "email",
         max_length=254,
         unique=True,
     )
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
 
 class Follow(models.Model):
@@ -35,6 +39,8 @@ class Follow(models.Model):
     )
 
     class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
         constraints = [
             models.UniqueConstraint(
                 fields=["author", "user"],

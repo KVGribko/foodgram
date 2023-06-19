@@ -4,8 +4,8 @@ services:
     container_name: foodgram-db
     image: postgres:15.2-alpine
     restart: always
-    # ports:
-    #   - 32700:5432
+    # ports: # for localhost
+    #   - 32702:5432
     env_file:
       - ./.env
     volumes:

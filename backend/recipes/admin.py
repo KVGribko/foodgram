@@ -2,14 +2,26 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import (FavoriteRecipes, Ingredient, Recipe, RecipeIngredient,
-                     ShoppingCart, Tag)
+from .models import (
+    FavoriteRecipes,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingCart,
+    Tag,
+)
+
+
+class IngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    min_num = 1
+    extra = 1
 
 
 class IngredientResource(resources.ModelResource):
     class Meta:
         model = Ingredient
-        exclude = ('id')
+        exclude = "id"
         import_id_fields = ["name"]
 
 
@@ -19,30 +31,6 @@ class ImportIngredientsAdmin(ImportExportModelAdmin):
     list_display = ["name", "measurement_unit"]
     search_fields = ["name"]
     list_filter = ["name"]
-
-
-@admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
-    list_display = ["name", "color", "slug"]
-
-
-@admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    list_display = ["name", "author", "count_in_favorites"]
-    list_filter = ["name", "author", "tags"]
-    search_fields = ["name"]
-    readonly_fields = ["count_in_favorites"]
-    fields = [
-        "image",
-        ("name", "author"),
-        "text",
-        "tags",
-        "cooking_time",
-        "count_in_favorites",
-    ]
-
-    def count_in_favorites(self, obj):
-        return obj.in_favorite.count()
 
 
 @admin.register(RecipeIngredient)
@@ -58,3 +46,28 @@ class FavoriteRecipesAdmin(admin.ModelAdmin):
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ("recipe", "user")
+
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ["name", "author", "count_in_favorites"]
+    list_filter = ["name", "author", "tags"]
+    search_fields = ["name", "author__username", "tags__name"]
+    readonly_fields = ["count_in_favorites"]
+    fields = [
+        ("name", "author"),
+        "image",
+        "text",
+        "tags",
+        "cooking_time",
+        "count_in_favorites",
+    ]
+    inlines = [IngredientInline]
+
+    def count_in_favorites(self, obj):
+        return obj.in_favorite.count()
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ["name", "color", "slug"]

@@ -6,19 +6,20 @@ from .models import Follow, User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = (
+    list_display = [
         "username",
         "id",
         "email",
         "first_name",
         "last_name",
-    )
-    list_filter = ("email", "username")
+    ]
+    list_filter = ["email", "username"]
+    search_fields = ["username", "email"]
 
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
-    list_display = (
+    list_display = [
         "user",
         "author",
-    )
+    ]

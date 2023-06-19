@@ -4,13 +4,21 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import F
-from djoser.serializers import (UserCreateSerializer, UserSerializer,
-                                ValidationError)
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from djoser.serializers import (
+    UserCreateSerializer,
+    UserSerializer,
+    ValidationError,
+)
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import (ImageField, IntegerField,
-                                        ModelSerializer,
-                                        PrimaryKeyRelatedField, Serializer)
+from rest_framework.serializers import (
+    ImageField,
+    IntegerField,
+    ModelSerializer,
+    PrimaryKeyRelatedField,
+    Serializer,
+)
+
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import Follow
 
 User = get_user_model()
@@ -165,6 +173,33 @@ class PostRecipeSerializer(ModelSerializer):
             "text",
             "cooking_time",
         ]
+
+    def validate_ingredients(self, ingredients):
+        if len(ingredients) == 0:
+            raise ValidationError("Ingredients cannot be empty")
+
+        if len(ingredients) != len(set(ingredients)):
+            raise ValidationError("Ingredients cannot be repeated")
+
+        for ingredient in ingredients:
+            if ingredient["amount"] <= 0:
+                raise ValidationError(
+                    "The number of ingredients must be greater than 0"
+                )
+        return ingredients
+
+    def validate_tags(self, tags):
+        if len(tags) == 0:
+            raise ValidationError("Tags cannot be empty")
+
+        if len(tags) != len(set(tags)):
+            raise ValidationError("Tags cannot be repeated")
+        return tags
+
+    def validate_cooking_time(self, time):
+        if time <= 0:
+            raise ValidationError("Cooking time must be greater than 0")
+        return time
 
     @transaction.atomic
     def create(self, validated_data):
