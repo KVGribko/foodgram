@@ -179,7 +179,7 @@ class PostRecipeSerializer(ModelSerializer):
             raise ValidationError("Ingredients cannot be empty")
 
         for i, ingredient in enumerate(ingredients):
-            for j in range(i, len(ingredients)):
+            for j in range(i + 1, len(ingredients)):
                 if ingredient == ingredients[j]:
                     raise ValidationError("Ingredients cannot be repeated")
 
@@ -194,8 +194,10 @@ class PostRecipeSerializer(ModelSerializer):
         if len(tags) == 0:
             raise ValidationError("Tags cannot be empty")
 
-        if len(tags) != len(set(tags)):
-            raise ValidationError("Tags cannot be repeated")
+        for i, tag in enumerate(tags):
+            for j in range(i + 1, len(tags)):
+                if tag == tags[j]:
+                    raise ValidationError("Tags cannot be repeated")
         return tags
 
     def validate_cooking_time(self, time):
