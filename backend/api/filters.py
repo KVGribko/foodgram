@@ -1,16 +1,14 @@
 from django_filters.rest_framework import FilterSet, filters
-# если сделать отступ между импортами ругается isort при автотестах Ci
-#  ./backend/api/filters.py:2:1: I004 isort found an unexpected blank line in imports
-# и так везде где я исправил замечания
+
 from recipes.models import Ingredient, Recipe, Tag
 
 
 class IngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='startswith')
+    name = filters.CharFilter(lookup_expr="startswith")
 
     class Meta:
         model = Ingredient
-        fields = ['name']
+        fields = ["name"]
 
 
 class RecipeFilter(FilterSet):

@@ -4,19 +4,12 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import F
-from djoser.serializers import (
-    UserCreateSerializer,
-    UserSerializer,
-    ValidationError,
-)
+from djoser.serializers import (UserCreateSerializer, UserSerializer,
+                                ValidationError)
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import (
-    ImageField,
-    IntegerField,
-    ModelSerializer,
-    PrimaryKeyRelatedField,
-    Serializer,
-)
+from rest_framework.serializers import (ImageField, IntegerField,
+                                        ModelSerializer,
+                                        PrimaryKeyRelatedField, Serializer)
 
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import Follow
@@ -173,13 +166,6 @@ class PostRecipeSerializer(ModelSerializer):
             "text",
             "cooking_time",
         ]
-
-    # def validate(self, attrs):
-    #     tags = self.initial_data.get("tags")
-    #     ingredients = self.initial_data.get("ingredients")
-    #     self.v_tags(tags)
-    #     self.v_ingredients(ingredients)
-    #     return attrs
 
     def validate_ingredients(self, ingredients):
         if len(ingredients) == 0:

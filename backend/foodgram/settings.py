@@ -7,7 +7,10 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY", 'django-insecure-no*ifnwb+@-ote%17t*6iem#xj!fteu_q1lgq!g$fiev5y+u79',)
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-no*ifnwb+@-ote%17t*6iem#xj!fteu_q1lgq!g$fiev5y+u79",
+)
 
 DEBUG = True
 
@@ -20,7 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'import_export',
+    "import_export",
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
