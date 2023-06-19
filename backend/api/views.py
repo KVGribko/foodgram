@@ -3,23 +3,36 @@ from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
-from recipes.models import (FavoriteRecipes, Ingredient, Recipe, ShoppingCart,
-                            Tag)
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from users.models import Follow
 
-from .filters import IngredientFilter, RecipeFilter
-from .pagination import PageLimitPagination
-from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializers import (FollowSerializer, FoodgramUserSerializer,
-                          GetRecipeSerializer, IngredientSerializer,
-                          PostRecipeSerializer, PreviewRecipeSerializer,
-                          TagSerializer)
+from api.filters import IngredientFilter, RecipeFilter
+from api.pagination import PageLimitPagination
+from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from api.serializers import (
+    FollowSerializer,
+    FoodgramUserSerializer,
+    GetRecipeSerializer,
+    IngredientSerializer,
+    PostRecipeSerializer,
+    PreviewRecipeSerializer,
+    TagSerializer,
+)
+from api.services import get_user_shopping_cart
+from recipes.models import (
+    FavoriteRecipes,
+    Ingredient,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
+from users.models import Follow
 
 User = get_user_model()
 
@@ -45,19 +58,19 @@ class UserViewSet(DjoserUserViewSet):
                 sub.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(
-                {'errors': "You are not subscribed to this author"},
+                {"errors": "You are not subscribed to this author"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if request.method == "POST":
             if sub.exists():
                 return Response(
-                    {'errors': "You are already subscribed to this author"},
+                    {"errors": "You are already subscribed to this author"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             follow = Follow.objects.create(user=user, author=author)
             serializer = FollowSerializer(
                 follow.author,
-                context={'request': request},
+                context={"request": request},
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -69,11 +82,9 @@ class UserViewSet(DjoserUserViewSet):
     def subscriptions(self, request):
         user = request.user
         serializer = FollowSerializer(
-            self.paginate_queryset(
-                User.objects.filter(following__user=user)
-            ),
+            self.paginate_queryset(User.objects.filter(following__user=user)),
             many=True,
-            context={'request': request},
+            context={"request": request},
         )
         return self.get_paginated_response(serializer.data)
 
@@ -164,32 +175,11 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def download_shopping_cart(self, request):
-        user = request.user
-        ingredients = Ingredient.objects.raw(
-            f"""
-            SELECT
-                --*
-                i.id,
-                i.name,
-                SUM(ri.amount) AS amount,
-                i.measurement_unit AS unit
-            FROM
-                recipes_ingredient AS i
-                INNER JOIN recipes_shoppingcart AS sc ON sc.user_id = {user.id}
-                INNER JOIN recipes_recipeingredient AS ri
-                ON
-                    sc.recipe_id = ri.recipe_id AND i.id = ri.ingredient_id
-            GROUP BY i.id;
-            """
-        )
-        shopping_list = [
-            f"{ingredient.name}: {ingredient.amount} {ingredient.unit}"
-            for ingredient in ingredients
-        ]
-        shopping_list = "\n".join(shopping_list)
+        shopping_list = get_user_shopping_cart(request.user)
         response = HttpResponse(
-            shopping_list, content_type="text.txt; charset=utf-8"
+            shopping_list,
+            content_type="text.txt; charset=utf-8",
         )
-        file_name = f'{user.username}_shopping_list.txt'
-        response['Content-Disposition'] = f'attachment; filename={file_name}'
+        file_name = f"{request.user.username}_shopping_list.txt"
+        response["Content-Disposition"] = f"attachment; filename={file_name}"
         return response
