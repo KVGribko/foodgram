@@ -178,8 +178,10 @@ class PostRecipeSerializer(ModelSerializer):
         if len(ingredients) == 0:
             raise ValidationError("Ingredients cannot be empty")
 
-        if len(ingredients) != len(set(ingredients)):
-            raise ValidationError("Ingredients cannot be repeated")
+        for i, ingredient in enumerate(ingredients):
+            for j in range(i, len(ingredients)):
+                if ingredient == ingredients[j]:
+                    raise ValidationError("Ingredients cannot be repeated")
 
         for ingredient in ingredients:
             if ingredient["amount"] <= 0:
