@@ -33,7 +33,7 @@ class UsersCreateSerializerForDjoser(UserCreateSerializer):
     def validate_username(self, username):
         if username == "me":
             raise ValidationError(
-                "Нельзя иИспользовать 'me' в качестве username"
+                "Нельзя использовать 'me' в качестве username"
             )
         return username
 
