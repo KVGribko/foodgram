@@ -32,7 +32,9 @@ class UsersCreateSerializerForDjoser(UserCreateSerializer):
 
     def validate_username(self, username):
         if username == "me":
-            raise ValidationError("Using 'me' as a username is not allowed")
+            raise ValidationError(
+                "Нельзя иИспользовать 'me' в качестве username"
+            )
         return username
 
 
@@ -169,31 +171,32 @@ class PostRecipeSerializer(ModelSerializer):
 
     def validate_ingredients(self, ingredients):
         if len(ingredients) == 0:
-            raise ValidationError("Ingredients cannot be empty")
+            raise ValidationError("Ингредиенты не должны быть пустыми")
 
-        for i, ingredient in enumerate(ingredients):
-            for j in range(i + 1, len(ingredients)):
-                if ingredient["id"] == ingredients[j]["id"]:
-                    raise ValidationError("Ingredients cannot be repeated.")
+        ingredients_id = set()
+        for ingredient in ingredients:
+            ingredients_id.add(ingredient["id"])
+        if len(ingredients_id) != len(ingredients):
+            raise ValidationError("Ингредиенты не должны повторятся")
 
         for ingredient in ingredients:
             if ingredient["amount"] <= 0:
                 raise ValidationError(
-                    "The number of ingredients must be greater than 0"
+                    "Количество ингредиентов должно быть больше 0"
                 )
         return ingredients
 
     def validate_tags(self, tags):
         if len(tags) == 0:
-            raise ValidationError("Tags cannot be empty")
+            raise ValidationError("Теги не должны быть пустыми")
 
         if len(tags) != len(set(tags)):
-            raise ValidationError("Tags cannot be repeated")
+            raise ValidationError("Теги не должны повторятся")
         return tags
 
     def validate_cooking_time(self, time):
         if time <= 0:
-            raise ValidationError("Cooking time must be greater than 0")
+            raise ValidationError("Время приготовление должно быть больше 0")
         return time
 
     @transaction.atomic

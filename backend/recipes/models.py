@@ -22,8 +22,8 @@ class Ingredient(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name = "Ингридиент"
-        verbose_name_plural = "Ингридиенты"
+        verbose_name = "Ингредиент"
+        verbose_name_plural = "Ингредиенты"
 
 
 class Recipe(models.Model):
@@ -40,7 +40,7 @@ class Recipe(models.Model):
         Ingredient,
         through="RecipeIngredient",
         related_name="recipes",
-        verbose_name="Ингридиенты",
+        verbose_name="Ингредиенты",
     )
     tags = models.ManyToManyField(
         Tag,
@@ -73,15 +73,15 @@ class RecipeIngredient(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         related_name="recipe",
-        verbose_name="Ингридиент",
+        verbose_name="Ингредиент",
     )
     amount = models.PositiveIntegerField(
         "Количество", validators=[MinValueValidator(1)]
     )
 
     class Meta:
-        verbose_name = "Ингридиенты рецепта"
-        verbose_name_plural = "Ингридиенты рецепта"
+        verbose_name = "Ингредиенты рецепта"
+        verbose_name_plural = "Ингредиенты рецепта"
         constraints = [
             models.UniqueConstraint(
                 fields=[
